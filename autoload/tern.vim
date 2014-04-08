@@ -9,6 +9,9 @@ import vim, os, platform, subprocess, urllib2, webbrowser, json, re, string, tim
 from itertools import groupby
 
 opener = urllib2.build_opener(urllib2.ProxyHandler({}))
+config = {
+    "show_error_message": int(vim.eval("get(g:, 'tern_show_error_message', 0)")),
+}
 
 def tern_displayError(err):
   vim.command("echo " + json.dumps(str(err)))
@@ -19,7 +22,8 @@ def tern_makeRequest(port, doc):
                           float(vim.eval("g:tern_request_timeout")));
     return json.loads(req.read())
   except urllib2.HTTPError, error:
-    tern_displayError(error.read())
+    if config["show_error_message"]:
+      tern_displayError(error.read())
     return None
 
 # Prefixed with _ to influence destruction order. See
